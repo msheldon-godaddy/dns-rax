@@ -926,6 +926,51 @@ void *raxFind(rax *rax, unsigned char *s, size_t len) {
     return raxGetData(h);
 }
 
+/* Find a key in the rax most closely matching, returns raxNotFound special void pointer value
+ * if the item was not found, otherwise the value associated with the
+ * item is returned. */
+void *raxFindClosest(rax *rax, unsigned char *s, size_t len) {
+    raxNode 	*h;
+    raxStack	rs;
+
+    memset(&rs, 0, sizeof(raxStack));
+    raxStackInit(&rs);
+
+    debugf("### Lookup: %.*s\n", (int)len, s);
+    int splitpos = 0;
+    size_t i = raxLowWalk(rax,s,len,&h,NULL,&splitpos,&rs);
+    if (i != len || (h->iscompr && splitpos != 0) || !h->iskey){
+    	void		*rdata;
+    	raxNode		*ch;
+
+    	//fprintf(stderr, "mismatch\n");
+
+    	if(h->iskey){
+			if((rdata = raxGetData(h))){
+				//fprintf(stderr, "got data from stopnode\n");
+				raxStackFree(&rs);
+				return rdata;
+			}
+    	}
+
+    	while((ch = raxStackPop(&rs))){
+    		if(ch->iskey){
+				if((rdata = raxGetData(ch))){
+					//fprintf(stderr, "got data from stack\n");
+					raxStackFree(&rs);
+					return rdata;
+				}
+    		}
+    	}
+    	//if((rdata = raxGetData))
+    	//fprintf(stderr, "data not found for %s\n", (char *)s);
+		raxStackFree(&rs);
+        return raxNotFound;
+    }
+    raxStackFree(&rs);
+    return raxGetData(h);
+}
+
 /* Return the memory address where the 'parent' node stores the specified
  * 'child' pointer, so that the caller can update the pointer with another
  * one if needed. The function assumes it will find a match, otherwise the
