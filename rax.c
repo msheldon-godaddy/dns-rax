@@ -927,7 +927,7 @@ void *raxFind(rax *rax, unsigned char *s, size_t len) {
 }
 
 /* Find a key in the rax most closely matching, returns raxNotFound special void pointer value
- * if the item was not found, otherwise the value associated with the
+ * if the item was not found at all, otherwise the value associated with the
  * item is returned. */
 void *raxFindClosest(rax *rax, unsigned char *s, size_t len) {
     raxNode 	*h;
@@ -940,32 +940,33 @@ void *raxFindClosest(rax *rax, unsigned char *s, size_t len) {
     int splitpos = 0;
     size_t i = raxLowWalk(rax,s,len,&h,NULL,&splitpos,&rs);
     if (i != len || (h->iscompr && splitpos != 0) || !h->iskey){
-    	void		*rdata;
+    	void		*rdata=NULL;
     	raxNode		*ch;
 
     	//fprintf(stderr, "mismatch\n");
-
+    	/* h is the last node in the chain, check if it has data (records) */
     	if(h->iskey){
-			if((rdata = raxGetData(h))){
+			rdata = raxGetData(h);
+			// if(rdata)
 				//fprintf(stderr, "got data from stopnode\n");
-				raxStackFree(&rs);
-				return rdata;
-			}
     	}
-
-    	while((ch = raxStackPop(&rs))){
+    	/* the last node didn't have actual data,
+    	 * so we'll back up along the path we got here from,
+    	 * until we find data */
+    	while(!rdata && (ch = raxStackPop(&rs))){
     		if(ch->iskey){
-				if((rdata = raxGetData(ch))){
+				rdata = raxGetData(ch);
+				//if(rdata)
 					//fprintf(stderr, "got data from stack\n");
-					raxStackFree(&rs);
-					return rdata;
-				}
     		}
     	}
-    	//if((rdata = raxGetData))
     	//fprintf(stderr, "data not found for %s\n", (char *)s);
+
 		raxStackFree(&rs);
-        return raxNotFound;
+		if(rdata)
+			return rdata;
+		else
+			return raxNotFound;
     }
     raxStackFree(&rs);
     return raxGetData(h);
