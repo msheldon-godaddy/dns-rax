@@ -197,6 +197,7 @@ void *raxFind(rax *rax, unsigned char *s, size_t len);
 void *raxFindClosest(rax *rax, unsigned char *s, size_t len);
 void raxFree(rax *rax);
 void raxFreeWithCallback(rax *rax, void (*free_callback)(void*));
+void raxFreeWithCallbackArg(rax *rax, void (*free_callback)(void*, void*), void *free_argdata);
 void raxStart(raxIterator *it, rax *rt);
 int raxSeek(raxIterator *it, const char *op, unsigned char *ele, size_t len);
 int raxSeekGreatest(raxIterator *it);
