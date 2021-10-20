@@ -30,6 +30,9 @@
 
 #ifndef RAX_H
 #define RAX_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -217,5 +220,9 @@ void raxSetDebugMsg(int onoff);
 /* Internal API. May be used by the node callback in order to access rax nodes
  * in a low level way, so this function is exported as well. */
 void raxSetData(raxNode *n, void *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
