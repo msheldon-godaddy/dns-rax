@@ -1313,6 +1313,7 @@ void raxFreeWithCallback(rax *rax, void (*free_callback)(void*)) {
 /* Free a whole radix tree, calling the specified callback in order to
  * free the auxiliary data. */
 void raxFreeWithCallbackArg(rax *rax, void (*free_callback)(void*, void*), void *free_argdata) {
+	if(!rax) return;
     raxRecursiveFreeArg(rax,rax->head,free_callback,free_argdata);
     assert(rax->numnodes == 0);
     rax_free(rax);
