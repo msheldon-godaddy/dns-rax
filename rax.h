@@ -198,6 +198,7 @@ int raxTryInsert(rax *rax, unsigned char *s, size_t len, void *data, void **old)
 int raxRemove(rax *rax, unsigned char *s, size_t len, void **old);
 void *raxFind(rax *rax, unsigned char *s, size_t len);
 void *raxFindClosest(rax *rax, unsigned char *s, size_t len);
+void *raxFindPrevious(rax *rax, unsigned char *s, size_t len);
 void raxFree(rax *rax);
 void raxFreeWithCallback(rax *rax, void (*free_callback)(void*));
 void raxFreeWithCallbackArg(rax *rax, void (*free_callback)(void*, void*), void *free_argdata);
@@ -207,6 +208,7 @@ int raxSeekGreatest(raxIterator *it);
 int raxNext(raxIterator *it);
 int raxPrev(raxIterator *it);
 void *raxGetData(raxNode *n);
+int raxIteratorNextStep(raxIterator *it, int noup);
 int raxIteratorPrevStep(raxIterator *it, int noup);
 int raxRandomWalk(raxIterator *it, size_t steps);
 int raxCompare(raxIterator *iter, const char *op, unsigned char *key, size_t key_len);

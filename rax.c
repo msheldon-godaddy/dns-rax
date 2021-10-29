@@ -926,9 +926,10 @@ void *raxFind(rax *rax, unsigned char *s, size_t len) {
     return raxGetData(h);
 }
 
-/* Find a key in the rax most closely matching, returns raxNotFound special void pointer value
- * if the item was not found at all, otherwise the value associated with the
- * item is returned. */
+/* Find a key in the rax equal to the name passed,
+ * or if no match, the last node with data found on the path,
+ * returns raxNotFound special void pointer value if the item was not found at all,
+ * otherwise the value associated with the node is returned. */
 void *raxFindClosest(rax *rax, unsigned char *s, size_t len) {
     raxNode 	*h;
     raxStack	rs;
@@ -970,6 +971,45 @@ void *raxFindClosest(rax *rax, unsigned char *s, size_t len) {
     }
     raxStackFree(&rs);
     return raxGetData(h);
+}
+
+
+/* Find a key in the rax alphabetically equal or previous to the name passed,
+ * returns raxNotFound special void pointer value if the item was not found at all,
+ * otherwise the value associated with the node is returned. */
+void *raxFindPrevious(rax *rax, unsigned char *s, size_t len) {
+    raxNode 	*h;
+    raxStack	rs;
+    size_t		origlen=len;
+	void		*rdata=NULL;
+
+    memset(&rs, 0, sizeof(raxStack));
+    raxStackInit(&rs);
+
+    debugf("### Lookup: %.*s\n", (int)len, s);
+    int splitpos = 0;
+    size_t i = raxLowWalk(rax,s,len,&h,NULL,&splitpos,&rs);
+    if (i != len || (h->iscompr && splitpos != 0) || !h->iskey){
+    	raxIterator it;
+
+		memset(&it, 0, sizeof(it));
+		raxStart(&it, rax);
+		raxSeek(&it, "<", s, origlen);
+		//fprintf(stderr, "Seek: %s Found: %s\n", (char *)s, (char *)it.key);
+		if(it.node->iskey)
+			rdata = raxGetData(it.node);
+		raxStop(&it);
+    }
+    else{
+    	//fprintf(stderr, "Direct Match\n");
+    	rdata = raxGetData(h);
+    }
+
+    raxStackFree(&rs);
+    if(rdata)
+    	return rdata;
+    else
+    	return raxNotFound;
 }
 
 /* Return the memory address where the 'parent' node stores the specified
