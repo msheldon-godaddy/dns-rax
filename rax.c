@@ -62,7 +62,7 @@ void raxDebugShowNode(const char *msg, raxNode *n);
 #define debugf(...)                                                            \
     if (raxDebugMsg) {                                                         \
         printf("%s:%s:%d:\t", __FILE__, __FUNCTION__, __LINE__);               \
-        printf(__VA_ARGS__);                                                   \
+        printf("%s", __VA_ARGS__);                                                   \
         fflush(stdout);                                                        \
     }
 
@@ -1982,11 +1982,10 @@ void raxRecursiveShow(int level, int lpad, raxNode *n) {
     }
     raxNode **cp = raxNodeFirstChildPtr(n);
     for (int i = 0; i < numchildren; i++) {
-        char *branch = " `-(%c) ";
         if (numchildren > 1) {
             printf("\n");
             for (int j = 0; j < lpad; j++) putchar(' ');
-            printf(branch,n->data[i]);
+            printf(" `-(%c) ",n->data[i]);
         } else {
             printf(" -> ");
         }
