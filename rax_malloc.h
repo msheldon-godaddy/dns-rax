@@ -37,7 +37,7 @@
 
 #ifndef RAX_ALLOC_H
 #define RAX_ALLOC_H
-#define rax_malloc malloc
-#define rax_realloc realloc
-#define rax_free free
+#define rax_malloc malloc_wrapped
+#define rax_realloc realloc_wrapped
+#define rax_free free_wrapped
 #endif
