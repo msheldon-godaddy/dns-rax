@@ -37,7 +37,7 @@
 
 #ifndef RAX_ALLOC_H
 #define RAX_ALLOC_H
-#include "../wrappers/alloc.h"//TODO: find better solution
+#include "../alloc.h"//TODO: find better solution
 #define rax_malloc malloc_wrapped
 #define rax_realloc realloc_wrapped
 #define rax_free free_wrapped
